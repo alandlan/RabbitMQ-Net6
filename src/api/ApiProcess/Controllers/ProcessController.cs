@@ -21,12 +21,17 @@ namespace ApiProcess.Controllers
         {
             var process = new Process(name);
 
-            var factory = new ConnectionFactory()
+            // var factory = new ConnectionFactory()
+            // {
+            //     HostName = "rabbitmq",
+            //     Port = 5672,
+            //     UserName = "guest",
+            //     Password = "guest"
+            // };
+
+            var factory = new ConnectionFactory
             {
-                HostName = "localhost",
-                Port = 5672,
-                UserName = "guest",
-                Password = "guest"
+                Uri = new Uri("amqp://guest:guest@rabbitmq:5672")
             };
 
             using var connection = factory.CreateConnection();
