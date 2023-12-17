@@ -16,6 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\shared\App\App.csproj" />
+    <ProjectReference Include="..\..\shared\DependencyInjection\DependencyInjection.csproj" />
     <ProjectReference Include="..\..\shared\Domain\Domain.csproj" />
+    <ProjectReference Include="..\..\shared\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 </Project>

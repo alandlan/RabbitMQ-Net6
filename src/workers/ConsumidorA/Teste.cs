@@ -1,26 +1,33 @@
-using Domain.Entity;
+﻿using Domain.Entity;
 using Domain.UseCases;
-using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Text.Json;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ConsumidorA
 {
-    public class Worker : BackgroundService
+    public sealed class Teste : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly IProcessUseCase _processUseCase;
         private readonly IServiceProvider _serviceProvider;
 
-        public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider)
+        public Teste(IServiceProvider serviceProvider)
         {
-            _logger = logger;
+            //_processUseCase = processUseCase;
             _serviceProvider = serviceProvider;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            
+            using var scope = _serviceProvider.CreateScope();
+            var _processUseCase = scope.ServiceProvider.GetRequiredService<IProcessUseCase>();
+
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -28,7 +35,7 @@ namespace ConsumidorA
 
                 var factory = new ConnectionFactory()
                 {
-                    //HostName = "rabbitmq",
+                    HostName = "rabbitmq",
                     Port = 5672,
                     UserName = "guest",
                     Password = "guest"
@@ -42,8 +49,6 @@ namespace ConsumidorA
                 using var connection = factory.CreateConnection();
                 using (var channel = connection.CreateModel())
                 {
-                    
-
                     channel.QueueDeclare(queue: "processQueue",
                                         durable: false,
                                         exclusive: false,
@@ -52,31 +57,24 @@ namespace ConsumidorA
 
                     var consumer = new EventingBasicConsumer(channel);
 
-                    ProcessEntity process = null;
+   
 
-                    consumer.Received += async (model, ea) =>
+                    consumer.Received += (model, ea) =>
                     {
                         var body = ea.Body.ToArray();
                         var message = Encoding.UTF8.GetString(body);
-                        process = JsonSerializer.Deserialize<ProcessEntity>(message);
+                        var process = JsonSerializer.Deserialize<ProcessEntity>(message);
 
-                        if(process != null)
+                        if (process != null)
                             process.ProcessAt = DateTime.Now;
 
-                        _logger.LogInformation($"Processo recebido: {process?.ToString()}");
-
-                        if (process != null && !String.IsNullOrEmpty(process.Name))
-                        {
-                            using var scope = _serviceProvider.CreateScope();
-                            var _processUseCase = scope.ServiceProvider.GetRequiredService<IProcessUseCase>();
-
-                            await _processUseCase.CreateAsync(process);
-                        }
                     };
 
                     channel.BasicConsume(queue: "processQueue",
                                         autoAck: true,
                                         consumer: consumer);
+
+
 
                     await Task.Delay(5000, stoppingToken);
                 }

@@ -1,17 +1,17 @@
 ﻿namespace Domain.Entity
 {
-    public class Process
+    public class ProcessEntity
     {
         public Guid Id { get; set; }
         public string? Name { get; set; }
         public DateTime CreateAt { get; set; }
         public DateTime? ProcessAt { get; set; }
 
-        public Process()
+        public ProcessEntity()
         {
         }
 
-        public Process(string name)
+        public ProcessEntity(string name)
         {
             Id = Guid.NewGuid();
             CreateAt = DateTime.Now;
