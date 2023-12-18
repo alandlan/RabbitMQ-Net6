@@ -9,6 +9,9 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/workers/ConsumidorA/ConsumidorA.csproj", "src/workers/ConsumidorA/"]
 COPY ["src/shared/Domain/Domain.csproj", "src/shared/Domain/"]
+COPY ["src/shared/Infrastructure/Infrastructure.csproj", "src/shared/Infrastructure/"]
+COPY ["src/shared/App/App.csproj", "src/shared/App/"]
+COPY ["src/shared/DependencyInjection/DependencyInjection.csproj", "src/shared/DependencyInjection/"]
 RUN dotnet restore "./src/workers/ConsumidorA/./ConsumidorA.csproj"
 COPY . .
 WORKDIR "/src/src/workers/ConsumidorA"

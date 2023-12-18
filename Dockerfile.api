@@ -10,6 +10,9 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/shared/Domain/Domain.csproj", "src/shared/Domain/"]
+COPY ["src/shared/Infrastructure/Infrastructure.csproj", "src/shared/Infrastructure/"]
+COPY ["src/shared/App/App.csproj", "src/shared/App/"]
+COPY ["src/shared/DependencyInjection/DependencyInjection.csproj", "src/shared/DependencyInjection/"]
 COPY ["src/api/ApiProcess/ApiProcess.csproj", "src/api/ApiProcess/"]
 RUN dotnet restore "./src/api/ApiProcess/./ApiProcess.csproj"
 COPY . .

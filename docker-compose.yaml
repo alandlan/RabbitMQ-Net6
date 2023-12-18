@@ -19,6 +19,24 @@ services:
         interval: 30s
         timeout: 10s
         retries: 5
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    hostname: 'sqlserver'
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "yourStrong(!)Password"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - '11433:1433'    
+    expose:
+      - 1433
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-Usa", "-PyourStrong(!)Password", "-Q", "select 1"]
+      interval: 1s
+      retries: 20
+    networks:
+      - rabbitmq_go_net
   api:
     image: ${DOCKER_REGISTRY-}api
     build:
@@ -26,6 +44,7 @@ services:
       dockerfile: /Dockerfile.api
     depends_on:
       - rabbitmq
+      - sqlserver
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:8081;http://+:8080
@@ -37,19 +56,23 @@ services:
       - "8081:8081"
       - "8080:8080"
     networks:
-        - rabbitmq_go_net
+      - rabbitmq_go_net
   worker-a:
     image: ${DOCKER_REGISTRY-}worker-a
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
     build:
       context: .
       dockerfile: /Dockerfile.worker-a
     depends_on:
+      sqlserver:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
     networks:
-        - rabbitmq_go_net
+      - rabbitmq_go_net
     links: 
-        - rabbitmq
+      - rabbitmq
           
 networks:
   rabbitmq_go_net:
