@@ -26,18 +26,18 @@ namespace ConsumidorA
             {
                 await Task.Delay(5000, stoppingToken);
 
-                var factory = new ConnectionFactory()
-                {
-                    //HostName = "rabbitmq",
-                    Port = 5672,
-                    UserName = "guest",
-                    Password = "guest"
-                };
-
-                //var factory = new ConnectionFactory
+                //var factory = new ConnectionFactory()
                 //{
-                //    Uri = new Uri("amqp://guest:guest@rabbitmq:5672")
+                //    //HostName = "rabbitmq",
+                //    Port = 5672,
+                //    UserName = "guest",
+                //    Password = "guest"
                 //};
+
+                var factory = new ConnectionFactory
+                {
+                    Uri = new Uri("amqp://guest:guest@rabbitmq:5672")
+                };
 
                 using var connection = factory.CreateConnection();
                 using (var channel = connection.CreateModel())

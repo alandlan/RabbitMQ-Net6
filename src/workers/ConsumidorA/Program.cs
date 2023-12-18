@@ -11,10 +11,18 @@ var builder = Host.CreateDefaultBuilder(args)
     {
         c.AddConfiguration(new ConfigurationBuilder()
                                 .AddJsonFile("appsettings.json")
+                                // .AddJsonFile($"appsettings.{configuration["Environment"]}.json", true)
+                                
                                 .AddEnvironmentVariables()
                                 .Build());
 
         configuration = c.Build();
+
+        //print connection string
+        // Console.WriteLine($"Connection String: {configuration.GetConnectionString("SqlConnection")}");
+
+        // //print environment
+        // Console.WriteLine($"Environment: {configuration["Environment"]}");
 
     })
     .ConfigureServices((builder, services) =>
