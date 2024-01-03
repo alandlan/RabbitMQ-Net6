@@ -6,10 +6,18 @@ using System.Text.Json;
 
 namespace ApiProcess.Controllers
 {
+    
     [ApiController]
     [Route("api/[controller]")]
     public class ProcessController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
+
+        public ProcessController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         [HttpGet]
         public IActionResult Get()
         {
@@ -21,17 +29,9 @@ namespace ApiProcess.Controllers
         {
             var process = new ProcessEntity(name);
 
-            //var factory = new ConnectionFactory()
-            //{
-            //    //HostName = "rabbitMq",
-            //    Port = 5672,
-            //    UserName = "guest",
-            //    Password = "guest"
-            //};
-
             var factory = new ConnectionFactory
             {
-                Uri = new Uri("amqp://guest:guest@rabbitmq:5672")
+                Uri = new Uri(uriString: _configuration.GetConnectionString("RabbitMqConnection"))
             };
 
             using var connection = factory.CreateConnection();

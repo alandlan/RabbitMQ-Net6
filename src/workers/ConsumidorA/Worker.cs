@@ -11,11 +11,13 @@ namespace ConsumidorA
     {
         private readonly ILogger<Worker> _logger;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IConfiguration _configuration;
 
-        public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider)
+        public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider, IConfiguration configuration)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
+            _configuration = configuration;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -26,17 +28,9 @@ namespace ConsumidorA
             {
                 await Task.Delay(5000, stoppingToken);
 
-                //var factory = new ConnectionFactory()
-                //{
-                //    //HostName = "rabbitmq",
-                //    Port = 5672,
-                //    UserName = "guest",
-                //    Password = "guest"
-                //};
-
                 var factory = new ConnectionFactory
                 {
-                    Uri = new Uri("amqp://guest:guest@rabbitmq:5672")
+                    Uri = new Uri(uriString: _configuration.GetConnectionString("RabbitMqConnection"))
                 };
 
                 using var connection = factory.CreateConnection();
